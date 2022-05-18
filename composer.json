@@ -14,5 +14,7 @@
             "email": "53569029+d9beuD@users.noreply.github.com"
         }
     ],
-    "require": {}
+    "require": {
+        "slim/slim": "^4.10"
+    }
 }
