@@ -21,14 +21,14 @@ class PermissionMiddleware implements MiddlewareInterface
     /**
      * Check a permission level against a permission mask.
      *
-     * @param int $mask   The permission mask to check against.
-     * @param int $level  The permission level to check.
+     * @param int $routeMask   The permission mask to check against.
+     * @param int $testedLevel  The permission level to check.
      *
      * @return bool True if the permission level is allowed, false otherwise.
      */
-    public static function checkMask(int $mask, int $level): bool
+    public static function checkMask(int $routeMask, int $testedLevel): bool
     {
-        return ($mask & $level) === $level;
+        return ($routeMask & $testedLevel) === $testedLevel;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -40,16 +40,16 @@ class PermissionMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $lastValue = $callable[count($callable) - 1];
-        $permissionLevel = $_SESSION[self::SESSION_PERMISSION]
+        $routeMask = $callable[count($callable) - 1];
+        $testedlevel = $_SESSION[self::SESSION_PERMISSION]
             ?? $this->permissions->getDefaultLevel();
 
-        if (!is_int($lastValue)) {
+        if (!is_int($routeMask)) {
             return $handler->handle($request);
         }
 
         $this->permissions->checkValidity();
-        $isValid = $this->checkMask($permissionLevel, $lastValue);
+        $isValid = $this->checkMask($routeMask, $testedlevel);
 
         if (!$isValid) {
             throw new HttpForbiddenException($request);
